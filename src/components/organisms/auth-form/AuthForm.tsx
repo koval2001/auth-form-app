@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Input from "../../atoms/input/Input.tsx";
 import Button from "../../atoms/button/Button.tsx";
 import classes from "./AuthForm.module.scss";
+import { passwordValidationConditions } from "./AuthForm.constants.tsx";
 
 interface IFormInput {
   email: string;
@@ -10,9 +11,21 @@ interface IFormInput {
 }
 
 const AuthForm: React.FC = () => {
-  const { register, handleSubmit, formState: { errors }} = useForm<IFormInput>({
-    mode: "onBlur", // Validation is triggered after blur event
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<IFormInput>({
+    mode: "onBlur",
   });
+
+  const password = watch("password", ""); // Watch the password input for changes
+
+  const [validationStates, setValidationStates] = useState<boolean[]>(
+    passwordValidationConditions.map(() => false)
+  );
+
+  useEffect(() => {
+    setValidationStates(
+      passwordValidationConditions.map((condition) => condition.test(password))
+    );
+  }, [password]);
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
@@ -40,26 +53,22 @@ const AuthForm: React.FC = () => {
           placeholder="Password"
           type="password"
           error={errors.password}
-          hint="8 characters or more (no spaces)"
+          validationConditions={passwordValidationConditions.map((condition, index) => ({
+            ...condition,
+            isValid: validationStates[index],
+          }))}
+          showErrorOnInvalid={!!errors.password}
           {...register("password", {
             required: "Password is required",
-            minLength: {
-              value: 8,
-              message: "Password must be at least 8 characters long",
-            },
-            maxLength: {
-              value: 64,
-              message: "Password must not exceed 64 characters",
-            },
-            pattern: {
-              value: /^(?=.*[A-Z])(?=.*\d)(?!.*\s).+$/,
-              message: "Password must contain at least 1 uppercase letter, 1 number, and no spaces",
+            validate: () => {
+              const isValid = validationStates.every((state) => state);
+              return isValid || "Password does not meet all requirements";
             },
           })}
         />
       </div>
 
-      <Button type="submit" label="Sign up"/>
+      <Button type="submit" label="Sign up" />
     </form>
   );
 };
