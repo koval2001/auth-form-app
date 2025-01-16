@@ -3,7 +3,6 @@
   max-width: 315px;
   height: 48px;
   padding: 10px 10px 10px 20px;
-  margin-bottom: 4px;
   border-radius: 10px;
   border: none;
   outline: none;
@@ -27,6 +26,23 @@
     }
   }
 
+  &__container {
+    position: relative;
+  }
+
+  &__toggleIcon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #404658;
+
+    &.isError {
+      color: #FF8080;
+    }
+  }
+
   &.isError {
     background: #FDEFEE;
     border: 1px solid #FF8080;
@@ -46,7 +62,7 @@
   }
 
   &__error {
-    margin-left: 20px;
+    padding: 4px 0 0 20px;
     font-size: 13px;
     font-weight: 400;
     line-height: 18px;
@@ -57,7 +73,7 @@
   &__validationConditions {
     display: flex;
     flex-direction: column;
-    padding-left: 20px;
+    padding: 4px 0 0 20px;
   }
 
   &__validationConditionsItem {
